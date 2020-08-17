@@ -5,7 +5,7 @@ defmodule Rumbl.Multimedia do
 
   import Ecto.Query, warn: false
   alias Rumbl.Repo
-
+  alias Rumbl.Accounts
   alias Rumbl.Multimedia.Video
 
   @doc """
@@ -112,7 +112,7 @@ defmodule Rumbl.Multimedia do
   def get_user_video!(%Accounts.User{} = user, id) do
     Video
     |> user_videos_query(user)
-    |> Repo.get!()
+    |> Repo.get!(id)
   end
 
   defp user_videos_query(query, %Accounts.User{id: user_id}) do
