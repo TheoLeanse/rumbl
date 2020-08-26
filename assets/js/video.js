@@ -1,3 +1,4 @@
+import { Presence } from "phoenix";
 import Player from "./player.js";
 let Video = {
   init(socket, element) {
@@ -13,10 +14,20 @@ let Video = {
     let msgContainer = document.getElementById("msg-container");
     let msgInput = document.getElementById("msg-input");
     let postButton = document.getElementById("msg-submit");
+    let userList = document.getElementById("user-list");
     let lastSeenId = 0;
     let vidChannel = socket.channel("videos:" + videoId, () => ({
       last_seen_id: lastSeenId
     }));
+    let presence = new Presence(vidChannel);
+    presence.onSync(() => {
+      userList.innerHTML = presence
+        .list((id, { metas: [first, ...rest], user: user }) => {
+          let count = rest.length + 1;
+          return `<li>${user.username}: (${count})</li>`;
+        })
+        .join("");
+    });
     postButton.addEventListener("click", e => {
       let payload = { body: msgInput.value, at: Player.getCurrentTime() };
       vidChannel.push("new_annotation", payload).receive("error", console.log);
